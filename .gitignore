@@ -1,2 +1,6 @@
 .env.local
 .vercel
+
+# Unrelated to this project
+Next/
+quiz-form.rar
