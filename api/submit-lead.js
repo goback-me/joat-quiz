@@ -38,24 +38,27 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  var payload = {
+  var contact = {
     name: clip(body.name, 100),
     phone: clip(body.phone, 20),
     email: clip(body.email, 200),
     suburb: clip(body.suburb, 100),
-    q1: body.q1,
-    q2: body.q2,
-    q3: body.q3,
-    q4: body.q4,
-    q5: body.q5,
-    q6: body.q6,
     created_at: body.created_at || new Date().toISOString()
   };
 
-  if (!EMAIL_RE.test(payload.email)) {
+  if (!EMAIL_RE.test(contact.email)) {
     res.status(400).json({ error: "Invalid email" });
     return;
   }
+
+  // Supabase columns are fixed as q1..q6; the webhook gets the same answers
+  // keyed by their question heading instead, for human-readable payloads.
+  var supabasePayload = Object.assign({}, contact, {
+    q1: body.q1, q2: body.q2, q3: body.q3, q4: body.q4, q5: body.q5, q6: body.q6
+  });
+  var webhookPayload = Object.assign({}, contact, {
+    answers: (body.answers && typeof body.answers === "object") ? body.answers : {}
+  });
 
   var requests = [
     fetch(process.env.SUPABASE_URL + "/rest/v1/leads", {
@@ -66,7 +69,7 @@ module.exports = async function handler(req, res) {
         "Authorization": "Bearer " + process.env.SUPABASE_SERVICE_KEY,
         "Prefer": "return=minimal"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(supabasePayload)
     })
   ];
 
@@ -74,7 +77,7 @@ module.exports = async function handler(req, res) {
     requests.push(fetch(process.env.WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(webhookPayload)
     }));
   }
 
