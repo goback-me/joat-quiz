@@ -152,7 +152,7 @@
         </div>
         <div class="field-group">
           <input type="tel" id="cf-phone" placeholder="Mobile number" oninput="checkContact()" />
-          <span class="field-error" id="cf-phone-error">Enter a valid mobile number</span>
+          <span class="field-error" id="cf-phone-error">Enter a valid Australian mobile number (04XX XXX XXX)</span>
         </div>
         <div class="field-group">
           <input type="email" id="cf-email" placeholder="Email address" oninput="checkContact()" />
@@ -310,8 +310,10 @@
   }
 
   function isValidPhone(phone) {
+    if (!/^[0-9+\-\s()]+$/.test(phone)) { return false; }
     var digits = phone.replace(/\D/g, "");
-    return digits.length >= 8 && digits.length <= 12 && /^[0-9+\-\s()]+$/.test(phone);
+    if (digits.length === 11 && digits.indexOf("61") === 0) { digits = "0" + digits.slice(2); }
+    return /^04\d{8}$/.test(digits); // AU mobile: 04XX XXX XXX (10 digits)
   }
 
   function setFieldValidity(inputEl, errorId, hasError) {
@@ -358,10 +360,12 @@
     var originalText = btn.textContent;
     btn.textContent = "Submitting...";
 
-    // ponytail: 4s cap so a stalled request never strands the user on this
-    // screen. Raise it if leads regularly need longer than that to save.
-    var timeout = new Promise(function(resolve) { setTimeout(resolve, 4000); });
-    Promise.race([submitLead(), timeout]).then(function() {
+    // ponytail: 4s cap so a stalled request never strands the user here, and
+    // a 600ms floor so the loading state is never a 0ms flash on fast/failed
+    // requests. Raise the cap if leads regularly need longer than that to save.
+    var maxWait = new Promise(function(resolve) { setTimeout(resolve, 4000); });
+    var minWait = new Promise(function(resolve) { setTimeout(resolve, 600); });
+    Promise.all([Promise.race([submitLead(), maxWait]), minWait]).then(function() {
       btn.textContent = originalText;
       btn.classList.add("enabled");
       navStack.push("contact");
