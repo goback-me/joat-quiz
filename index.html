@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bathroom Renovation Report — Jake of All Trades</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; }
+.quiz-outer { max-width: 680px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+.brand-bar { text-align: center; margin-bottom: 2.5rem; }
+.brand-name { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+.progress-bar-bg { height: 3px; background: #e0e0db; border-radius: 2px; margin-bottom: 2.5rem; }
+.progress-bar-fill { height: 3px; background: #1a6ef5; border-radius: 2px; transition: width 0.4s ease; }
+.step { display: none; }
+.step.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.eyebrow { font-size: 12px; color: #999; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.q-title { font-size: 24px; font-weight: 600; color: #1a1a18; margin-bottom: 0.5rem; line-height: 1.3; }
+.q-sub { font-size: 15px; color: #666; margin-bottom: 1.75rem; line-height: 1.6; }
+.options { display: flex; flex-direction: column; gap: 10px; }
+.opt-btn { display: flex; align-items: center; gap: 14px; padding: 15px 18px; background: #fff; border: 1.5px solid #e8e8e4; border-radius: 14px; cursor: pointer; text-align: left; font-size: 15px; color: #1a1a18; transition: border-color 0.15s, background 0.15s, transform 0.1s; width: 100%; }
+.opt-btn:hover { border-color: #1a6ef5; background: #f0f6ff; transform: translateY(-1px); }
+.opt-btn.selected { border-color: #1a6ef5; background: #f0f6ff; }
+.opt-icon { width: 36px; height: 36px; border-radius: 10px; background: #f5f5f3; border: 1px solid #e8e8e4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+.opt-btn.selected .opt-icon { background: #1a6ef5; border-color: #1a6ef5; }
+.opt-label { flex: 1; }
+.opt-label strong { display: block; font-weight: 600; font-size: 15px; }
+.opt-label span { font-size: 13px; color: #888; margin-top: 2px; display: block; }
+.nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+.btn-back { background: none; border: 1.5px solid #e0e0db; border-radius: 10px; padding: 10px 22px; font-size: 14px; color: #888; cursor: pointer; font-weight: 500; transition: border-color 0.15s, color 0.15s; }
+.btn-back:hover { border-color: #aaa; color: #444; }
+.btn-next { background: #1a6ef5; border: none; border-radius: 10px; padding: 12px 30px; font-size: 15px; font-weight: 600; color: #fff; cursor: pointer; opacity: 0.35; pointer-events: none; transition: opacity 0.15s; }
+.btn-next.enabled { opacity: 1; pointer-events: auto; }
+.btn-next.enabled:hover { opacity: 0.9; }
+.intro-screen { text-align: center; padding: 1rem 0 2rem; }
+.intro-screen h1 { font-size: 26px; font-weight: 700; color: #1a1a18; line-height: 1.35; margin-bottom: 1rem; }
+.intro-screen p { font-size: 16px; color: #666; line-height: 1.65; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+.trust-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 2.5rem; }
+.trust-pill { background: #fff; border: 1px solid #e8e8e4; border-radius: 20px; padding: 7px 16px; font-size: 13px; color: #666; }
+.start-btn { background: #1a6ef5; color: #fff; border: none; border-radius: 12px; padding: 15px 40px; font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.start-btn:hover { opacity: 0.9; }
+.contact-form { display: flex; flex-direction: column; gap: 12px; margin-top: 1.5rem; }
+.contact-form input { width: 100%; padding: 13px 16px; border: 1.5px solid #e8e8e4; border-radius: 10px; font-size: 15px; background: #fff; color: #1a1a18; transition: border-color 0.15s; }
+.contact-form input:focus { outline: none; border-color: #1a6ef5; }
+.contact-form input::placeholder { color: #bbb; }
+.report-wrap { padding-top: 0.5rem; }
+.report-hero { border: 1.5px solid #e8e8e4; border-radius: 16px; padding: 1.75rem; margin-bottom: 1.25rem; background: #fff; }
+.report-hero-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin-bottom: 0.5rem; }
+.report-hero-title { font-size: 18px; font-weight: 600; color: #1a1a18; margin-bottom: 0.4rem; }
+.report-hero-sub { font-size: 14px; color: #888; margin-top: 0.35rem; line-height: 1.55; }
+.includes-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
+.includes-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #555; }
+.includes-list li::before { content: '✓'; color: #22c55e; font-weight: 700; flex-shrink: 0; }
+.risk-section-label { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin: 1.75rem 0 0.75rem; }
+.risk-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+.risk-card { border-radius: 14px; padding: 1.1rem 1.25rem; border: 1.5px solid; }
+.risk-card.green { background: #f0fdf4; border-color: #86efac; }
+.risk-card.amber { background: #fffbeb; border-color: #fcd34d; }
+.risk-card.red { background: #fef2f2; border-color: #fca5a5; }
+.risk-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 0.35rem; }
+.risk-card-icon { font-size: 18px; flex-shrink: 0; }
+.risk-card-title { font-size: 14px; font-weight: 600; }
+.risk-card.green .risk-card-title { color: #15803d; }
+.risk-card.amber .risk-card-title { color: #b45309; }
+.risk-card.red .risk-card-title { color: #b91c1c; }
+.risk-card-body { font-size: 14px; color: #555; line-height: 1.55; padding-left: 28px; }
+.verdict-box { background: #fff; border: 1.5px solid #e8e8e4; border-radius: 14px; padding: 1.4rem; margin-bottom: 1.25rem; }
+.verdict-box h3 { font-size: 16px; font-weight: 600; color: #1a1a18; margin-bottom: 0.4rem; }
+.verdict-box p { font-size: 14px; color: #666; line-height: 1.65; }
+.cta-box { background: #1a1a18; border-radius: 16px; padding: 2rem; text-align: center; margin-top: 1.5rem; }
+.cta-box h3 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+.cta-box p { font-size: 15px; color: #aaa; margin-bottom: 1.5rem; line-height: 1.6; }
+.cta-main-btn { display: inline-block; background: #1a6ef5; color: #fff; border: none; border-radius: 12px; padding: 15px 32px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: opacity 0.15s; }
+.cta-main-btn:hover { opacity: 0.9; }
+.cta-note { font-size: 12px; color: #888; text-align: center; margin-top: 1rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="quiz-outer">
+
+  <div class="brand-bar"><div class="brand-name">Jake of All Trades</div></div>
+  <div class="progress-bar-bg" id="progressBg" style="display:none"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+
+  <!-- INTRO -->
+  <div class="step active" id="step-intro">
+    <div class="intro-screen">
+      <h1>Find out what is actually involved in your bathroom renovation before you talk to anyone</h1>
+      <p>Answer 6 quick questions. We will show you where costs move, what needs to be confirmed, and what the real risks are for your specific renovation.</p>
+      <div class="trust-pills">
+        <div class="trust-pill">&#8987; 2 minutes</div>
+        <div class="trust-pill">&#128205; Sydney, NSW</div>
+        <div class="trust-pill">&#128274; No obligation</div>
+      </div>
+      <button class="start-btn" onclick="startQuiz()">Start my renovation report &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Q1-Q6: rendered from QUESTIONS by renderQuestionSteps() -->
+  <div id="question-steps"></div>
+
+  <!-- CONTACT -->
+  <div class="step" id="step-contact">
+    <div class="eyebrow">Almost there</div>
+    <div class="q-title">Where should we send your report?</div>
+    <div class="q-sub">Your personalised Bathroom Renovation Report is ready. Enter your details below.</div>
+    <div class="contact-form">
+      <input type="text" id="cf-name" placeholder="First name" oninput="checkContact()" />
+      <input type="tel" id="cf-phone" placeholder="Mobile number" oninput="checkContact()" />
+      <input type="email" id="cf-email" placeholder="Email address" oninput="checkContact()" />
+      <input type="text" id="cf-suburb" placeholder="Suburb (e.g. Mosman, Castle Hill)" />
+      <input type="text" id="cf-hp" name="hp_field" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;" />
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()">&larr; Back</button>
+      <button class="btn-next" id="next-contact" onclick="showReport()">Show my report &rarr;</button>
+    </div>
+  </div>
+
+  <!-- REPORT -->
+  <div class="step" id="step-report">
+    <div class="report-wrap" id="report-content"></div>
+  </div>
+
+</div>
+<script>
+var answers = {};
+var navStack = ["intro"];
+var currentStep = "intro";
+
+var QUESTIONS = [
+  { q: "q1", title: "What are you renovating?",
+    sub: "This affects scope, plumbing complexity, and what needs to be confirmed on site.",
+    options: [
+      { val: "main", icon: "&#128703;", label: "Main bathroom", sub: "Full family bathroom" },
+      { val: "ensuite", icon: "&#128703;", label: "Ensuite", sub: "Attached to master bedroom" },
+      { val: "both", icon: "&#127968;", label: "Both main bathroom and ensuite", sub: "Two rooms, one project" },
+      { val: "laundry", icon: "&#128296;", label: "Bathroom and laundry combo", sub: "Combined space renovation" }
+    ] },
+  { q: "q2", title: "Are you keeping the same layout?",
+    sub: "Moving plumbing — shower, toilet, or adding a bath — is one of the most common ways renovation costs change. It can only be properly assessed on site.",
+    options: [
+      { val: "same", icon: "&#9989;", label: "Same layout — nothing moves", sub: "Straight swap, no plumbing changes" },
+      { val: "minor", icon: "&#8596;&#65039;", label: "Minor change — moving vanity only", sub: "Vanity position shift, minor plumbing move" },
+      { val: "major", icon: "&#128297;", label: "Major change — moving shower, toilet or adding a bath", sub: "Drain, waste, and set-out changes required" },
+      { val: "unsure", icon: "&#10067;", label: "Not sure yet", sub: "Still planning the layout" }
+    ] },
+  { q: "q3", title: "Who is supplying your toilet, taps, basin and shower fittings?",
+    sub: "These are called PC items — your toilet suite, basin, tapware, shower mixer, and shower head. Who supplies them is one of the most common places renovation budgets move unexpectedly.",
+    options: [
+      { val: "builder", icon: "&#128296;", label: "I need the builder to supply them for me", sub: "We source at trade rates and pass the savings directly to you" },
+      { val: "self", icon: "&#128shopping_cart;", label: "I will supply them myself", sub: "You source and purchase your own toilet, taps, basin and fittings" }
+    ] },
+  { q: "q4", title: "Who is supplying your tiles?",
+    sub: "Tiling installation is included in the renovation scope — but the tiles and grout themselves are not. This is another area where costs can move, especially if selections change mid-project.",
+    options: [
+      { val: "builder", icon: "&#127959;&#65039;", label: "I need the builder to supply the tiles", sub: "We help you select and source tiles within your budget" },
+      { val: "self", icon: "&#128717;", label: "I will supply my own tiles", sub: "You purchase and deliver tiles to site before install" }
+    ] },
+  { q: "q5", title: "Have you already received a quote?",
+    sub: "This helps us flag anything worth looking at in what you have seen so far.",
+    options: [
+      { val: "no", icon: "&#128269;", label: "No, still looking", sub: "Have not spoken to any builders yet" },
+      { val: "low", icon: "&#9888;&#65039;", label: "Yes — under $25,000", sub: "Worth understanding what is actually included" },
+      { val: "high", icon: "&#9989;", label: "Yes — over $25,000", sub: "In the right ballpark for a quality renovation" }
+    ] },
+  { q: "q6", title: "When are you hoping to start?",
+    sub: "Knowing your timeline helps us give you the most relevant next step.",
+    options: [
+      { val: "asap", icon: "&#128640;", label: "As soon as possible", sub: "Ready to move once the right builder is confirmed" },
+      { val: "soon", icon: "&#128197;", label: "Within the next 1 to 2 months", sub: "Actively planning and comparing options now" },
+      { val: "exploring", icon: "&#129517;", label: "Just exploring options", sub: "No firm timeline yet, still researching" }
+    ] }
+];
+
+function renderQuestionSteps() {
+  var html = "";
+  QUESTIONS.forEach(function(q, i) {
+    var n = i + 1;
+    var isLast = n === QUESTIONS.length;
+    var nextArg = isLast ? "'contact'" : (n + 1);
+    html += '<div class="step" id="step-' + n + '">';
+    html += '<div class="eyebrow">Step ' + n + ' of ' + QUESTIONS.length + '</div>';
+    html += '<div class="q-title">' + q.title + '</div>';
+    html += '<div class="q-sub">' + q.sub + '</div>';
+    html += '<div class="options">';
+    q.options.forEach(function(o) {
+      html += '<button class="opt-btn" data-val="' + o.val + '" onclick="selectOpt(this,\'' + q.q + '\')">' +
+        '<div class="opt-icon">' + o.icon + '</div>' +
+        '<div class="opt-label"><strong>' + o.label + '</strong><span>' + o.sub + '</span></div></button>';
+    });
+    html += '</div><div class="nav-row"><button class="btn-back" onclick="goBack()">&larr; Back</button>' +
+      '<button class="btn-next" id="next-' + n + '" onclick="goNext(' + nextArg + ')">' +
+      (isLast ? 'See my report' : 'Continue') + ' &rarr;</button></div></div>';
+  });
+  document.getElementById("question-steps").innerHTML = html;
+}
+renderQuestionSteps();
+
+function startQuiz() {
+  document.getElementById("progressBg").style.display = "block";
+  goToStep("1");
+}
+
+function selectOpt(btn, q) {
+  var opts = btn.closest(".options").querySelectorAll(".opt-btn");
+  opts.forEach(function(b) { b.classList.remove("selected"); });
+  btn.classList.add("selected");
+  answers[q] = btn.getAttribute("data-val");
+  var stepNum = q.replace("q", "");
+  var nextBtn = document.getElementById("next-" + stepNum);
+  if (nextBtn) { nextBtn.classList.add("enabled"); }
+}
+
+function goNext(next) {
+  navStack.push(currentStep);
+  goToStep(String(next));
+}
+
+function goBack() {
+  if (navStack.length > 1) {
+    var prev = navStack.pop();
+    goToStep(prev);
+  }
+}
+
+function goToStep(step) {
+  document.querySelectorAll(".step").forEach(function(s) { s.classList.remove("active"); });
+  var el = document.getElementById("step-" + step);
+  if (el) { el.classList.add("active"); }
+  currentStep = step;
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+function updateProgress() {
+  var steps = { "intro": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "contact": 7, "report": 8 };
+  var cur = steps[currentStep] || 0;
+  var pct = Math.round((cur / 7) * 100);
+  document.getElementById("progressFill").style.width = pct + "%";
+}
+
+function checkContact() {
+  var fn = document.getElementById("cf-name").value.trim();
+  var ph = document.getElementById("cf-phone").value.trim();
+  var em = document.getElementById("cf-email").value.trim();
+  var btn = document.getElementById("next-contact");
+  if (fn && ph && em) { btn.classList.add("enabled"); }
+  else { btn.classList.remove("enabled"); }
+}
+
+function showReport() {
+  submitLead(); // fire-and-forget, must not block the report
+  navStack.push("contact");
+  goToStep("report");
+  renderReport();
+}
+
+function submitLead() {
+  var payload = {
+    name: document.getElementById("cf-name").value.trim(),
+    phone: document.getElementById("cf-phone").value.trim(),
+    email: document.getElementById("cf-email").value.trim(),
+    suburb: document.getElementById("cf-suburb").value.trim(),
+    q1: answers.q1,
+    q2: answers.q2,
+    q3: answers.q3,
+    q4: answers.q4,
+    q5: answers.q5,
+    q6: answers.q6,
+    honeypot: document.getElementById("cf-hp").value,
+    created_at: new Date().toISOString()
+  };
+
+  fetch("/api/submit-lead", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    keepalive: true
+  }).catch(function(err) { console.error("Lead submission failed:", err); });
+}
+
+function renderReport() {
+  var layout = answers.q2;
+  var quote = answers.q5;
+
+  var layoutRisk = (layout === "major" || layout === "unsure");
+  var quoteRisk = (quote === "low");
+
+  var pathType = layoutRisk ? "B" : "A";
+  if (quoteRisk && layoutRisk) { pathType = "D"; }
+  else if (quoteRisk) { pathType = "C"; }
+
+  var headline = "";
+  var summary = "";
+
+  if (pathType === "A") {
+    headline = "Here is where your renovation budget could move.";
+    summary = "Even with a straightforward layout, there are three areas where costs quietly shift on most bathroom renovations. Knowing them before you talk to any builder puts you in control.";
+  } else if (pathType === "B") {
+    headline = "Your renovation has a layout change and three areas where costs could blow out.";
+    summary = "Layout changes add scope. But the three areas below catch most homeowners off guard regardless of layout. Here is what to watch.";
+  } else if (pathType === "C") {
+    headline = "Your existing quote needs a closer look before you go any further.";
+    summary = "A quote under $25,000 in Sydney is almost always missing inclusions. Here are the three areas where that money disappears, and what to check before accepting anything.";
+  } else {
+    headline = "Your renovation has a layout change, a quote worth scrutinising, and three cost risk areas.";
+    summary = "This is exactly the scenario where budgets blow out. Here is what to watch before you sign anything.";
+  }
+
+  var out = "";
+
+  // HEADLINE + SUMMARY
+  out += "<div style='margin-bottom:1.75rem'>";
+  out += "<div class='eyebrow' style='margin-bottom:0.5rem'>Your renovation report</div>";
+  out += "<div style='font-size:22px;font-weight:700;color:#1a1a18;line-height:1.3;margin-bottom:0.6rem'>" + headline + "</div>";
+  out += "<p style='font-size:15px;color:#666;line-height:1.6'>" + summary + "</p>";
+  out += "</div>";
+
+  // RISK CARDS
+  out += "<div style='font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.65rem'>Where costs move</div>";
+  out += "<div style='display:flex;flex-direction:column;gap:10px;margin-bottom:2rem'>";
+
+  // LAYOUT — conditional
+  if (layoutRisk) {
+    out += "<div class='risk-card amber'>";
+    out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Layout change — scope must be confirmed on site</span></div>";
+    if (layout === "major") {
+      out += "<p class='risk-card-body'>Moving the shower, toilet, or adding a bath changes drain positions, waste lines, and set-out. This cannot be accurately scoped or priced without a site visit. Any builder quoting this without inspecting the bathroom first is guessing.</p>";
+    } else {
+      out += "<p class='risk-card-body'>Layout is not locked in yet. This is the first thing to confirm. Every other cost in the renovation flows from what the layout requires. Until it is fixed, no number given to you is reliable.</p>";
+    }
+    out += "</div>";
+  }
+
+  // PC ITEMS — always amber, us vs them
+  out += "<div class='risk-card amber'>";
+  out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Fixtures and fittings — a common place builders inflate costs</span></div>";
+  out += "<p class='risk-card-body'>This is how the industry works: most builders add a margin on top of whatever they pay for your toilet, taps, basin, and shower fittings. You rarely see the wholesale price. At Jake of All Trades we use our supplier network pricing and you choose the products yourself. You see what things actually cost.</p>";
+  out += "</div>";
+
+  // TILES — always amber, us vs them
+  out += "<div class='risk-card amber'>";
+  out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Tiles — where $4,000 to $5,000 quietly disappears</span></div>";
+  out += "<p class='risk-card-body'>Tile supply sits outside most renovation quotes. Homeowners pick a tile they love, do not check quantities or format costs, and end up spending far more than expected. We help you understand what your tile choice will actually cost before you commit, and source through our supplier network where possible to keep it in check.</p>";
+  out += "</div>";
+
+  // LOW QUOTE — conditional red
+  if (quoteRisk) {
+    out += "<div class='risk-card red'>";
+    out += "<div class='risk-card-head'><span class='risk-card-icon'>&#128680;</span><span class='risk-card-title'>Your existing quote is likely missing inclusions</span></div>";
+    out += "<p class='risk-card-body'>A quote under $25,000 for a full bathroom renovation in Sydney almost always has items excluded. The most common: waterproofing specification, tile supply, PC item allowance, and final fit-off. Before accepting any number at this level, ask for a line-by-line breakdown of exactly what is in and what is not.</p>";
+    out += "</div>";
+  }
+
+  out += "</div>";
+
+  // CTA
+  out += "<div class='cta-box' style='margin-bottom:1.5rem'>";
+  out += "<h3>Book your Renovation Mapping Session</h3>";
+  out += "<p>We come to your bathroom, walk the scope, review your selections with supplier network pricing, and give you a clear picture of what your renovation will actually cost.</p>";
+  out += "<button class='cta-main-btn' onclick='bookSession()'>Book my mapping session &rarr;</button>";
+  out += "<p style='font-size:12px;color:#888;margin-top:0.75rem'>No obligation. No inflated quote. Just the full picture.</p>";
+  out += "</div>";
+
+  // WHAT TO EXPECT
+  out += "<div style='border:1.5px solid #e8e8e4;border-radius:14px;padding:1.25rem;background:#fff;margin-bottom:1.5rem'>";
+  out += "<div style='font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem'>What to expect at your mapping session</div>";
+  out += "<div style='font-size:14px;color:#555;line-height:1.6;display:flex;flex-direction:column;gap:0.6rem'>";
+  var expects = [
+    "We walk your bathroom and confirm what is actually involved",
+    "Review your layout and flag any plumbing changes before they become variations",
+    "Go through fixture and fitting options using our supplier network pricing",
+    "Map your tile selection against real supply costs before you commit",
+    "Build a scope document so nothing is missing from your quote",
+    "Give you a clear picture before you sign anything"
+  ];
+  expects.forEach(function(e) {
+    out += "<div style='display:flex;gap:10px;align-items:flex-start'><span style='color:#22c55e;font-weight:700;flex-shrink:0'>&#10003;</span><span>" + e + "</span></div>";
+  });
+  out += "</div></div>";
+
+  out += "<p style='font-size:12px;color:#aaa;text-align:center;line-height:1.5;padding-bottom:1rem'>Jake of All Trades &middot; Sydney, NSW &middot; This report is based on your answers and is not a formal quote.</p>";
+
+  document.getElementById("report-content").innerHTML = out;
+}
+
+function bookSession() { alert("Booking flow connects here"); }
+</script>
+</body>
+</html>
