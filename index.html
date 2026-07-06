@@ -3,7 +3,7 @@
   <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bathroom Renovation Report — Jake of All Trades</title>
+  <title>Bathroom Renovation Report - Jake of All Trades</title>
   <style>
   :root {
     --bg: #f5f5f3;
@@ -191,21 +191,21 @@
         { val: "laundry", icon: "&#128296;", label: "Bathroom and laundry combo", sub: "Combined space renovation" }
       ] },
     { q: "q2", title: "Are you keeping the same layout?",
-      sub: "Moving plumbing — shower, toilet, or adding a bath — is one of the most common ways renovation costs change. It can only be properly assessed on site.",
+      sub: "Moving plumbing - shower, toilet, or adding a bath - is one of the most common ways renovation costs change. It can only be properly assessed on site.",
       options: [
-        { val: "same", icon: "&#9989;", label: "Same layout — nothing moves", sub: "Straight swap, no plumbing changes" },
-        { val: "minor", icon: "&#8596;&#65039;", label: "Minor change — moving vanity only", sub: "Vanity position shift, minor plumbing move" },
-        { val: "major", icon: "&#128297;", label: "Major change — moving shower, toilet or adding a bath", sub: "Drain, waste, and set-out changes required" },
+        { val: "same", icon: "&#9989;", label: "Same layout - nothing moves", sub: "Straight swap, no plumbing changes" },
+        { val: "minor", icon: "&#8596;&#65039;", label: "Minor change - moving vanity only", sub: "Vanity position shift, minor plumbing move" },
+        { val: "major", icon: "&#128297;", label: "Major change - moving shower, toilet or adding a bath", sub: "Drain, waste, and set-out changes required" },
         { val: "unsure", icon: "&#10067;", label: "Not sure yet", sub: "Still planning the layout" }
       ] },
     { q: "q3", title: "Who is supplying your toilet, taps, basin and shower fittings?",
-      sub: "These are called PC items — your toilet suite, basin, tapware, shower mixer, and shower head. Who supplies them is one of the most common places renovation budgets move unexpectedly.",
+      sub: "These are called PC items - your toilet suite, basin, tapware, shower mixer, and shower head. Who supplies them is one of the most common places renovation budgets move unexpectedly.",
       options: [
         { val: "builder", icon: "&#128296;", label: "I need the builder to supply them for me", sub: "We source at trade rates and pass the savings directly to you" },
         { val: "self", icon: "&#128722;", label: "I will supply them myself", sub: "You source and purchase your own toilet, taps, basin and fittings" }
       ] },
     { q: "q4", title: "Who is supplying your tiles?",
-      sub: "Tiling installation is included in the renovation scope — but the tiles and grout themselves are not. This is another area where costs can move, especially if selections change mid-project.",
+      sub: "Tiling installation is included in the renovation scope - but the tiles and grout themselves are not. This is another area where costs can move, especially if selections change mid-project.",
       options: [
         { val: "builder", icon: "&#127959;&#65039;", label: "I need the builder to supply the tiles", sub: "We help you select and source tiles within your budget" },
         { val: "self", icon: "&#129521;", label: "I will supply my own tiles", sub: "You purchase and deliver tiles to site before install" }
@@ -214,8 +214,8 @@
       sub: "This helps us flag anything worth looking at in what you have seen so far.",
       options: [
         { val: "no", icon: "&#128269;", label: "No, still looking", sub: "Have not spoken to any builders yet" },
-        { val: "low", icon: "&#9888;&#65039;", label: "Yes — under $25,000", sub: "Worth understanding what is actually included" },
-        { val: "high", icon: "&#9989;", label: "Yes — over $25,000", sub: "In the right ballpark for a quality renovation" }
+        { val: "low", icon: "&#9888;&#65039;", label: "Yes - under $25,000", sub: "Worth understanding what is actually included" },
+        { val: "high", icon: "&#9989;", label: "Yes - over $25,000", sub: "In the right ballpark for a quality renovation" }
       ] },
     { q: "q6", title: "Almost there",
       sub: "Knowing your timeline helps us give you the most relevant next step.",
@@ -281,7 +281,7 @@
   // ---- Embed / resizable-iframe support ----
   // When this page is loaded inside an <iframe> (see embed.js), it reports its
   // own content height to the parent window via postMessage so the host page
-  // can resize the iframe to fit — no fixed height or scrollbars needed.
+  // can resize the iframe to fit - no fixed height or scrollbars needed.
   var lastReportedHeight = 0;
   function notifyEmbedResize() {
     if (window.self === window.top) { return; }
@@ -449,10 +449,10 @@
     out += "<div style='font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.65rem'>Where costs move</div>";
     out += "<div style='display:flex;flex-direction:column;gap:10px;margin-bottom:2rem'>";
 
-    // LAYOUT — conditional
+    // LAYOUT - conditional
     if (layoutRisk) {
       out += "<div class='risk-card amber'>";
-      out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Layout change — scope must be confirmed on site</span></div>";
+      out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Layout change - scope must be confirmed on site</span></div>";
       if (layout === "major") {
         out += "<p class='risk-card-body'>Moving the shower, toilet, or adding a bath changes drain positions, waste lines, and set-out. This cannot be accurately scoped or priced without a site visit. Any builder quoting this without inspecting the bathroom first is guessing.</p>";
       } else {
@@ -461,19 +461,19 @@
       out += "</div>";
     }
 
-    // PC ITEMS — always amber, us vs them
+    // PC ITEMS - always amber, us vs them
     out += "<div class='risk-card amber'>";
-    out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Fixtures and fittings — a common place builders inflate costs</span></div>";
+    out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Fixtures and fittings - a common place builders inflate costs</span></div>";
     out += "<p class='risk-card-body'>This is how the industry works: most builders add a margin on top of whatever they pay for your toilet, taps, basin, and shower fittings. You rarely see the wholesale price. At Jake of All Trades we use our supplier network pricing and you choose the products yourself. You see what things actually cost.</p>";
     out += "</div>";
 
-    // TILES — always amber, us vs them
+    // TILES - always amber, us vs them
     out += "<div class='risk-card amber'>";
-    out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Tiles — where $4,000 to $5,000 quietly disappears</span></div>";
+    out += "<div class='risk-card-head'><span class='risk-card-icon'>&#9888;&#65039;</span><span class='risk-card-title'>Tiles - where $4,000 to $5,000 quietly disappears</span></div>";
     out += "<p class='risk-card-body'>Tile supply sits outside most renovation quotes. Homeowners pick a tile they love, do not check quantities or format costs, and end up spending far more than expected. We help you understand what your tile choice will actually cost before you commit, and source through our supplier network where possible to keep it in check.</p>";
     out += "</div>";
 
-    // LOW QUOTE — conditional red
+    // LOW QUOTE - conditional red
     if (quoteRisk) {
       out += "<div class='risk-card red'>";
       out += "<div class='risk-card-head'><span class='risk-card-icon'>&#128680;</span><span class='risk-card-title'>Your existing quote is likely missing inclusions</span></div>";
