@@ -22,6 +22,8 @@
   src="https://www.facebook.com/tr?id=1216030470502878&ev=PageView&noscript=1"
   /></noscript>
   <!-- End Meta Pixel Code -->
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
   <style>
   :root {
     --bg: #f5f5f3;
@@ -37,8 +39,10 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { font-family: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
   .quiz-outer { max-width: 680px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2rem) 1rem 4rem; }
+  body.report-only { min-height: 0; }
+  body.report-only .quiz-outer { padding-bottom: 1.5rem; }
   .brand-bar { text-align: center; margin-bottom: clamp(1.5rem, 5vw, 2.5rem); }
   .brand-name { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
   .progress-bar-bg { height: 8px; background: #e0e0db; border-radius: 5px; margin-bottom: clamp(1.5rem, 5vw, 2.5rem); overflow: hidden; }
@@ -264,8 +268,20 @@
     });
     document.getElementById("question-steps").innerHTML = html;
   }
-  renderQuestionSteps();
-  updateProgress();
+  // Report-only embed mode: ?view=report&q2=..&q5=.. renders just the report
+  // (used on the thank-you page after redirect) with no quiz UI around it.
+  var embedParams = new URLSearchParams(window.location.search);
+  if (embedParams.get("view") === "report") {
+    document.body.classList.add("report-only");
+    document.querySelector(".quiz-outer").innerHTML = '<div class="report-wrap" id="report-content"></div>';
+    answers.q2 = embedParams.get("q2") || "";
+    answers.q5 = embedParams.get("q5") || "";
+    renderReport();
+    notifyEmbedResize();
+  } else {
+    renderQuestionSteps();
+    updateProgress();
+  }
 
   function selectOpt(btn, q, next) {
     var opts = btn.closest(".options").querySelectorAll(".opt-btn");
@@ -390,7 +406,8 @@
     var maxWait = new Promise(function(resolve) { setTimeout(resolve, 4000); });
     var minWait = new Promise(function(resolve) { setTimeout(resolve, 600); });
     Promise.all([Promise.race([submitLead(), maxWait]), minWait]).then(function() {
-      window.location.href = "https://aizall58.sg-host.com/thank-you-report/";
+      var q = "?q2=" + encodeURIComponent(answers.q2 || "") + "&q5=" + encodeURIComponent(answers.q5 || "");
+      window.location.href = "https://aizall58.sg-host.com/thank-you-report/" + q;
     });
   }
 
