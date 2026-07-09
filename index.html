@@ -304,7 +304,11 @@
   var lastReportedHeight = 0;
   function notifyEmbedResize() {
     if (window.self === window.top) { return; }
-    var height = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    // .quiz-outer, not document.documentElement - body has min-height:100vh
+    // for standalone viewing, which would otherwise force every step to
+    // report full-viewport height regardless of how little content it has.
+    var content = document.querySelector(".quiz-outer");
+    var height = content ? Math.ceil(content.getBoundingClientRect().height) : 0;
     if (!height || height === lastReportedHeight) { return; }
     lastReportedHeight = height;
     try {
@@ -312,7 +316,8 @@
     } catch (e) { /* no-op */ }
   }
   if (window.self !== window.top && "ResizeObserver" in window) {
-    new ResizeObserver(notifyEmbedResize).observe(document.documentElement);
+    var embedResizeTarget = document.querySelector(".quiz-outer") || document.documentElement;
+    new ResizeObserver(notifyEmbedResize).observe(embedResizeTarget);
   }
   window.addEventListener("load", notifyEmbedResize);
   window.addEventListener("orientationchange", function () { setTimeout(notifyEmbedResize, 300); });
@@ -385,11 +390,7 @@
     var maxWait = new Promise(function(resolve) { setTimeout(resolve, 4000); });
     var minWait = new Promise(function(resolve) { setTimeout(resolve, 600); });
     Promise.all([Promise.race([submitLead(), maxWait]), minWait]).then(function() {
-      btn.textContent = originalText;
-      btn.classList.add("enabled");
-      navStack.push("contact");
-      goToStep("report");
-      renderReport();
+      window.location.href = "https://aizall58.sg-host.com/thank-you-report/";
     });
   }
 
