@@ -396,9 +396,18 @@
   function showReport() {
     var btn = document.getElementById("next-contact");
     if (!btn.classList.contains("enabled")) { return; }
-    submitLead(); // fire-and-forget, must not delay the redirect
-    var q = "?q2=" + encodeURIComponent(answers.q2 || "") + "&q5=" + encodeURIComponent(answers.q5 || "");
-    window.location.href = "https://aizall58.sg-host.com/thank-you-report/" + q;
+    btn.classList.remove("enabled");
+    btn.textContent = "Submitting...";
+
+    // ponytail: 4s cap so a stalled request never strands the user here, and
+    // a 600ms floor so the loading state is never a 0ms flash on fast/failed
+    // requests. Raise the cap if leads regularly need longer than that to save.
+    var maxWait = new Promise(function(resolve) { setTimeout(resolve, 4000); });
+    var minWait = new Promise(function(resolve) { setTimeout(resolve, 600); });
+    Promise.all([Promise.race([submitLead(), maxWait]), minWait]).then(function() {
+      var q = "?q2=" + encodeURIComponent(answers.q2 || "") + "&q5=" + encodeURIComponent(answers.q5 || "");
+      window.location.href = "https://aizall58.sg-host.com/thank-you-report/" + q;
+    });
   }
 
   function answerLabel(q, val) {
