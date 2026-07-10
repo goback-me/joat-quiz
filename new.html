@@ -35,13 +35,11 @@
     --radius-lg: 16px;
     --radius-md: 14px;
     --radius-sm: 10px;
-    --safe-b: env(safe-area-inset-bottom, 0px);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
-  body { font-family: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-  .quiz-outer { max-width: 680px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2rem) 1rem 4rem; }
-  body.report-only { min-height: 0; }
+  body { font-family: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  .quiz-outer { max-width: 680px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2rem) 1rem 1.5rem; }
   body.report-only .quiz-outer { padding-bottom: 1.5rem; }
   .brand-bar { text-align: center; margin-bottom: clamp(1.5rem, 5vw, 2.5rem); }
   .brand-name { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
@@ -128,20 +126,8 @@
 
   @media (max-width: 640px) {
     .brand-bar, .q-sub { display: none; }
-    .quiz-outer { padding-bottom: 110px; }
     .opt-btn { padding: 13px 14px; gap: 12px; }
     .opt-icon { width: 34px; height: 34px; font-size: 16px; }
-    .nav-row {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      margin: 0;
-      padding: 12px 16px calc(12px + var(--safe-b));
-      background: rgba(245,245,243,0.92);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
-      z-index: 30;
-    }
     .cta-box { padding: 1.5rem 1.25rem; }
     .risk-card { padding: 1rem; }
     .risk-card-body { padding-left: 0; margin-top: 0.5rem; }
