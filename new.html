@@ -392,7 +392,7 @@
     var minWait = new Promise(function(resolve) { setTimeout(resolve, 600); });
     Promise.all([Promise.race([submitLead(), maxWait]), minWait]).then(function() {
       var q = "?q2=" + encodeURIComponent(answers.q2 || "") + "&q5=" + encodeURIComponent(answers.q5 || "");
-      window.top.location.href = "https://aizall58.sg-host.com/report/" + q;
+      window.top.location.href = "https://aizall58.sg-host.com/v2/report/" + q;
     });
   }
 
