@@ -257,6 +257,15 @@
   // Report-only embed mode: ?view=report&q2=..&q5=.. renders just the report
   // (used on the thank-you page after redirect) with no quiz UI around it.
   var embedParams = new URLSearchParams(window.location.search);
+  // Ad/campaign tracking: ?lead_source=facebook&campaign=..&ad_name=.. forwarded
+  // in from the host page's own URL (see embed snippet), plus the page it was
+  // shown on - sent through to the lead webhook on submit.
+  var tracking = {
+    lead_source: embedParams.get("lead_source") || "",
+    campaign: embedParams.get("campaign") || "",
+    ad_name: embedParams.get("ad_name") || "",
+    page_url: embedParams.get("page_url") || (window.self !== window.top ? document.referrer : window.location.href)
+  };
   if (embedParams.get("view") === "report") {
     document.body.classList.add("report-only");
     document.querySelector(".quiz-outer").innerHTML = '<div class="report-wrap" id="report-content"></div>';
@@ -418,6 +427,10 @@
       q5: answers.q5,
       q6: answers.q6,
       answers: answersByHeading,
+      lead_source: tracking.lead_source,
+      campaign: tracking.campaign,
+      ad_name: tracking.ad_name,
+      page_url: tracking.page_url,
       honeypot: document.getElementById("cf-hp").value,
       created_at: new Date().toISOString()
     };

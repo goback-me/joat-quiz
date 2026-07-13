@@ -57,7 +57,11 @@ module.exports = async function handler(req, res) {
     q1: body.q1, q2: body.q2, q3: body.q3, q4: body.q4, q5: body.q5, q6: body.q6
   });
   var webhookPayload = Object.assign({}, contact, {
-    answers: (body.answers && typeof body.answers === "object") ? body.answers : {}
+    answers: (body.answers && typeof body.answers === "object") ? body.answers : {},
+    lead_source: clip(body.lead_source, 100),
+    campaign: clip(body.campaign, 200),
+    ad_name: clip(body.ad_name, 200),
+    page_url: clip(body.page_url, 500)
   });
 
   var requests = [
