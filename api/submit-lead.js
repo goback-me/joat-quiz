@@ -61,6 +61,7 @@ module.exports = async function handler(req, res) {
     lead_source: clip(body.lead_source, 100),
     campaign: clip(body.campaign, 200),
     ad_name: clip(body.ad_name, 200),
+    adset: clip(body.adset, 200),
     page_url: clip(body.page_url, 500)
   });
 
