@@ -12,9 +12,31 @@
  * The iframe auto-resizes to fit its content via postMessage — no scrollbars,
  * no guessing a fixed height. index.html sends { type: "jake-form-resize",
  * height } to its parent whenever its content height changes.
+ *
+ * Ad/campaign tracking (lead_source, campaign, ad_name, etc.) and the page
+ * URL are forwarded automatically: any query params already on the host
+ * page's own URL are merged onto the iframe src (without overriding params
+ * data-src already sets, e.g. ?view=report), and page_url is added as the
+ * host page's full URL. No per-page script needed beyond the div + this tag.
  */
 (function () {
   "use strict";
+
+  function withForwardedParams(src) {
+    var url;
+    try {
+      url = new URL(src, window.location.href);
+    } catch (e) {
+      return src;
+    }
+    new URLSearchParams(window.location.search).forEach(function (value, key) {
+      if (!url.searchParams.has(key)) { url.searchParams.set(key, value); }
+    });
+    if (!url.searchParams.has("page_url")) {
+      url.searchParams.set("page_url", window.location.href);
+    }
+    return url.toString();
+  }
 
   function createFrame(container) {
     var src = container.getAttribute("data-src");
@@ -24,7 +46,7 @@
     }
 
     var iframe = document.createElement("iframe");
-    iframe.src = src;
+    iframe.src = withForwardedParams(src);
     iframe.title = container.getAttribute("data-title") || "Bathroom Renovation Report";
     iframe.setAttribute("scrolling", "no");
     iframe.setAttribute("frameborder", "0");
