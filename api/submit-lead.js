@@ -62,6 +62,12 @@ module.exports = async function handler(req, res) {
     campaign: clip(body.campaign, 200),
     ad_name: clip(body.ad_name, 200),
     adset: clip(body.adset, 200),
+    utm_source: clip(body.utm_source, 100),
+    utm_medium: clip(body.utm_medium, 100),
+    utm_campaign: clip(body.utm_campaign, 200),
+    utm_content: clip(body.utm_content, 200),
+    utm_adset: clip(body.utm_adset, 200),
+    utm_ad: clip(body.utm_ad, 200),
     page_url: clip(body.page_url, 500)
   });
 

@@ -9,7 +9,7 @@
   <script>
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  n.callMethod.appl+y(n,arguments):n.queue.push(arguments)};
   if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
   n.queue=[];t=b.createElement(e);t.async=!0;
   t.src=v;s=b.getElementsByTagName(e)[0];
@@ -257,7 +257,8 @@
   // Report-only embed mode: ?view=report&q2=..&q5=.. renders just the report
   // (used on the thank-you page after redirect) with no quiz UI around it.
   var embedParams = new URLSearchParams(window.location.search);
-  // Ad/campaign tracking: ?lead_source=facebook&campaign=..&ad_name=..&adset=.. forwarded
+  // Ad/campaign tracking: ?lead_source=facebook&campaign=..&ad_name=..&adset=..
+  // (plus utm_source/utm_medium/utm_campaign/utm_content/utm_adset/utm_ad) forwarded
   // in from the host page's own URL (see embed snippet), plus the page it was
   // shown on - sent through to the lead webhook on submit.
   var tracking = {
@@ -265,6 +266,12 @@
     campaign: embedParams.get("campaign") || "",
     ad_name: embedParams.get("ad_name") || "",
     adset: embedParams.get("adset") || "",
+    utm_source: embedParams.get("utm_source") || "",
+    utm_medium: embedParams.get("utm_medium") || "",
+    utm_campaign: embedParams.get("utm_campaign") || "",
+    utm_content: embedParams.get("utm_content") || "",
+    utm_adset: embedParams.get("utm_adset") || "",
+    utm_ad: embedParams.get("utm_ad") || "",
     page_url: embedParams.get("page_url") || (window.self !== window.top ? document.referrer : window.location.href)
   };
   if (embedParams.get("view") === "report") {
@@ -432,6 +439,12 @@
       campaign: tracking.campaign,
       ad_name: tracking.ad_name,
       adset: tracking.adset,
+      utm_source: tracking.utm_source,
+      utm_medium: tracking.utm_medium,
+      utm_campaign: tracking.utm_campaign,
+      utm_content: tracking.utm_content,
+      utm_adset: tracking.utm_adset,
+      utm_ad: tracking.utm_ad,
       page_url: tracking.page_url,
       honeypot: document.getElementById("cf-hp").value,
       created_at: new Date().toISOString()
