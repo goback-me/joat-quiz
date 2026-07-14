@@ -78,13 +78,14 @@ module.exports = async function handler(req, res) {
     })
   ];
 
-  if (process.env.WEBHOOK_URL) {
-    requests.push(fetch(process.env.WEBHOOK_URL, {
+  // WEBHOOK_URL can be a single URL or a comma-separated list to fan the lead out to multiple webhooks.
+  (process.env.WEBHOOK_URL || "").split(",").map(function(u) { return u.trim(); }).filter(Boolean).forEach(function(url) {
+    requests.push(fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(webhookPayload)
     }));
-  }
+  });
 
   var results = await Promise.allSettled(requests);
   var anyOk = results.some(function(r) { return r.status === "fulfilled" && r.value.ok; });
