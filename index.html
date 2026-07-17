@@ -266,14 +266,7 @@
           '<div class="opt-icon">' + o.icon + '</div>' +
           '<div class="opt-label"><strong>' + o.label + '</strong><span>' + o.sub + '</span></div></button>';
       });
-      html += '</div>';
-      if (q.q === "q7") {
-        html += '<div class="verdict-box" id="disqualify-msg" style="display:none;margin-top:1.25rem">' +
-          '<h3>Thanks for stopping by! &#128075;</h3>' +
-          '<p>At the moment we\'re focused on renovations within about an hour of Sydney\'s CBD, so we\'re not quite the right fit for this project. We really appreciate you taking the time, and wish you all the best with your renovation!</p>' +
-          '</div>';
-      }
-      html += '<div class="nav-row"><button class="btn-back" onclick="goBack()">&larr; Back</button></div></div>';
+      html += '</div><div class="nav-row"><button class="btn-back" onclick="goBack()">&larr; Back</button></div></div>';
     });
     document.getElementById("question-steps").innerHTML = html;
   }
@@ -314,12 +307,21 @@
     opts.forEach(function(b) { b.classList.remove("selected"); });
     btn.classList.add("selected");
     answers[q] = btn.getAttribute("data-val");
-    if (q === "q7") {
-      var msg = document.getElementById("disqualify-msg");
-      if (answers.q7 === "no") { msg.style.display = "block"; return; }
-      msg.style.display = "none";
+    if (q === "q7" && answers.q7 === "no") {
+      showDisqualified();
+      return;
     }
     setTimeout(function() { goNext(next); }, 350);
+  }
+
+  // Permanently swaps the location-check step for a dead-end message - no
+  // options or Back button left to click, so a "No" answer can't be undone
+  // and the quiz can't be submitted after it.
+  function showDisqualified() {
+    document.getElementById("step-7").innerHTML =
+      '<div class="verdict-box"><h3>Thanks for stopping by! &#128075;</h3>' +
+      '<p>At the moment we\'re focused on renovations within about an hour of Sydney\'s CBD, so we\'re not quite the right fit for this project. We really appreciate you taking the time, and wish you all the best with your renovation!</p></div>';
+    notifyEmbedResize();
   }
 
   function goNext(next) {
