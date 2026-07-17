@@ -300,6 +300,13 @@
   } else {
     renderQuestionSteps();
     updateProgress();
+    // Unique per-browser tag so a disqualified user still sees the same
+    // dead-end message after reloading instead of getting another shot.
+    if (localStorage.getItem("jake_quiz_disqualified") === "1") {
+      answers.q7 = "no";
+      goToStep("7");
+      showDisqualified();
+    }
   }
 
   function selectOpt(btn, q, next) {
@@ -318,6 +325,7 @@
   // options or Back button left to click, so a "No" answer can't be undone
   // and the quiz can't be submitted after it.
   function showDisqualified() {
+    try { localStorage.setItem("jake_quiz_disqualified", "1"); } catch (e) { /* no-op */ }
     document.getElementById("step-7").innerHTML =
       '<div class="verdict-box"><h3>Thanks for stopping by! &#128075;</h3>' +
       '<p>At the moment we\'re focused on renovations within about an hour of Sydney\'s CBD, so we\'re not quite the right fit for this project. We really appreciate you taking the time, and wish you all the best with your renovation!</p></div>';
