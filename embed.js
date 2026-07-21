@@ -11,7 +11,7 @@
  *
  * The iframe auto-resizes to fit its content via postMessage — no scrollbars,
  * no guessing a fixed height. index.html sends { type: "jake-form-resize",
- * height } to its parent whenever its content height changes.
+ * height } to its parent   whenever its content height changes.
  *
  * Ad/campaign tracking (lead_source, campaign, ad_name, etc.) and the page
  * URL are forwarded automatically: any query params already on the host
