@@ -212,6 +212,15 @@
   var currentStep = "1";
 
   var QUESTIONS = [
+    { q: "q0", title: "Are you renovating your home?",
+      sub: "Just confirming this quiz is the right fit for what you need.",
+      options: [
+        { val: "yes", icon: "&#9989;", label: "Yes", sub: "I'm renovating a bathroom" },
+        { val: "no", icon: "&#128683;", label: "No", sub: "Not renovating right now" }
+      ],
+      disqualifyOn: "no",
+      disqualifyTag: "Disqualified - Not Renovating",
+      disqualifyMessage: "This quiz is just for homeowners currently renovating a bathroom, so it looks like it's not quite the right fit for you today. Thanks so much for stopping by!" },
     { q: "q1", title: "What are you renovating?",
       sub: "This affects scope, plumbing complexity, and what needs to be confirmed on site.",
       options: [
@@ -259,7 +268,10 @@
       options: [
         { val: "yes", icon: "&#9989;", label: "Yes", sub: "Within about an hour of the CBD" },
         { val: "no", icon: "&#128683;", label: "No", sub: "Further out than that" }
-      ] }
+      ],
+      disqualifyOn: "no",
+      disqualifyTag: "Disqualified - Outside Service Area",
+      disqualifyMessage: "At the moment we're focused on renovations within about an hour of Sydney's CBD, so we're not quite the right fit for this project. We really appreciate you taking the time, and wish you all the best with your renovation!" }
   ];
 
   function renderQuestionSteps() {
@@ -311,12 +323,13 @@
   } else {
     renderQuestionSteps();
     updateProgress();
-    // Unique per-browser tag so a disqualified user still sees the same
-    // dead-end message after reloading instead of getting another shot.
-    if (localStorage.getItem("jake_quiz_disqualified") === "1") {
-      answers.q7 = "no";
-      goToStep("7");
-      showDisqualified();
+    // Per-browser tag so a disqualified user still sees the same dead-end
+    // message after reloading instead of getting another shot at the quiz.
+    var dqQuestion = QUESTIONS.filter(function(x) { return x.q === localStorage.getItem("jake_quiz_disqualified_q"); })[0];
+    if (dqQuestion) {
+      answers[dqQuestion.q] = dqQuestion.disqualifyOn;
+      goToStep(String(QUESTIONS.indexOf(dqQuestion) + 1));
+      showDisqualified(dqQuestion);
     }
   }
 
@@ -325,21 +338,29 @@
     opts.forEach(function(b) { b.classList.remove("selected"); });
     btn.classList.add("selected");
     answers[q] = btn.getAttribute("data-val");
-    if (q === "q7" && answers.q7 === "no") {
-      showDisqualified();
+    var question = QUESTIONS.filter(function(x) { return x.q === q; })[0];
+    if (question && question.disqualifyOn === answers[q]) {
+      showDisqualified(question);
       return;
     }
     setTimeout(function() { goNext(next); }, 350);
   }
 
-  // Permanently swaps the location-check step for a dead-end message - no
-  // options or Back button left to click, so a "No" answer can't be undone
-  // and the quiz can't be submitted after it.
-  function showDisqualified() {
-    try { localStorage.setItem("jake_quiz_disqualified", "1"); } catch (e) { /* no-op */ }
-    document.getElementById("step-7").innerHTML =
-      '<div class="verdict-box"><h3>Thanks for stopping by! &#128075;</h3>' +
-      '<p>At the moment we\'re focused on renovations within about an hour of Sydney\'s CBD, so we\'re not quite the right fit for this project. We really appreciate you taking the time, and wish you all the best with your renovation!</p></div>';
+  // Permanently swaps a gate question's step for a dead-end message - no
+  // options or Back button left to click, so the disqualifying answer can't
+  // be undone and the quiz can't be submitted after it. Persists across
+  // reloads via localStorage, and fires a Meta Pixel custom event so
+  // disqualifications (and why) are visible in Events Manager.
+  function showDisqualified(question) {
+    var step = document.getElementById("step-" + (QUESTIONS.indexOf(question) + 1));
+    if (!step) { return; }
+    try {
+      localStorage.setItem("jake_quiz_disqualified", "1");
+      localStorage.setItem("jake_quiz_disqualified_q", question.q);
+    } catch (e) { /* no-op */ }
+    step.innerHTML = '<div class="verdict-box"><h3>Thanks for stopping by! &#128075;</h3>' +
+      '<p>' + question.disqualifyMessage + '</p></div>';
+    if (window.fbq) { fbq('trackCustom', 'Disqualified', { reason: question.disqualifyTag }); }
     notifyEmbedResize();
   }
 
@@ -391,9 +412,9 @@
   window.addEventListener("orientationchange", function () { setTimeout(notifyEmbedResize, 300); });
 
   function updateProgress() {
-    var steps = { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "contact": 8, "report": 9 };
+    var steps = { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "contact": 9, "report": 10 };
     var cur = steps[currentStep] || 0;
-    var pct = Math.round((cur / 8) * 100);
+    var pct = Math.round((cur / 9) * 100);
     document.getElementById("progressFill").style.width = pct + "%";
   }
 
