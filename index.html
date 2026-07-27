@@ -192,6 +192,10 @@
           <input type="email" id="cf-email" placeholder="Email address" oninput="checkContact()" />
           <span class="field-error" id="cf-email-error">Enter a valid email address</span>
         </div>
+        <div class="field-group">
+          <input type="text" id="cf-suburb" placeholder="Suburb (e.g. Mosman, Castle Hill)" oninput="checkContact()" onblur="markTouched(this)" />
+          <span class="field-error" id="cf-suburb-error">Enter your suburb</span>
+        </div>
         <input type="text" id="cf-hp" name="hp_field" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;" />
       </div>
       <div class="nav-row">
@@ -212,15 +216,6 @@
   var currentStep = "1";
 
   var QUESTIONS = [
-    { q: "q0", title: "Are you renovating your home?",
-      sub: "Just confirming this quiz is the right fit for what you need.",
-      options: [
-        { val: "yes", icon: "&#9989;", label: "Yes", sub: "I'm renovating a bathroom" },
-        { val: "no", icon: "&#128683;", label: "No", sub: "Not renovating right now" }
-      ],
-      disqualifyOn: "no",
-      disqualifyTag: "Disqualified - Not Renovating",
-      disqualifyMessage: "This quiz is just for homeowners currently renovating a bathroom, so it looks like it's not quite the right fit for you today. Thanks so much for stopping by!" },
     { q: "q1", title: "What are you renovating?",
       sub: "This affects scope, plumbing complexity, and what needs to be confirmed on site.",
       options: [
@@ -262,16 +257,7 @@
         { val: "asap", icon: "&#128640;", label: "As soon as possible", sub: "Ready to move once the right builder is confirmed" },
         { val: "soon", icon: "&#128197;", label: "Within the next 1 to 2 months", sub: "Actively planning and comparing options now" },
         { val: "exploring", icon: "&#129517;", label: "Just exploring options", sub: "No firm timeline yet, still researching" }
-      ] },
-    { q: "q7", title: "Are you located within 1 hour of the Sydney CBD?",
-      sub: "We're a Sydney-based team, so this just helps us confirm we can get out to your project.",
-      options: [
-        { val: "yes", icon: "&#9989;", label: "Yes", sub: "Within about an hour of the CBD" },
-        { val: "no", icon: "&#128683;", label: "No", sub: "Further out than that" }
-      ],
-      disqualifyOn: "no",
-      disqualifyTag: "Disqualified - Outside Service Area",
-      disqualifyMessage: "At the moment we're focused on renovations within about an hour of Sydney's CBD, so we're not quite the right fit for this project. We really appreciate you taking the time, and wish you all the best with your renovation!" }
+      ] }
   ];
 
   function renderQuestionSteps() {
@@ -323,14 +309,6 @@
   } else {
     renderQuestionSteps();
     updateProgress();
-    // Per-browser tag so a disqualified user still sees the same dead-end
-    // message after reloading instead of getting another shot at the quiz.
-    var dqQuestion = QUESTIONS.filter(function(x) { return x.q === localStorage.getItem("jake_quiz_disqualified_q"); })[0];
-    if (dqQuestion) {
-      answers[dqQuestion.q] = dqQuestion.disqualifyOn;
-      goToStep(String(QUESTIONS.indexOf(dqQuestion) + 1));
-      showDisqualified(dqQuestion);
-    }
   }
 
   function selectOpt(btn, q, next) {
@@ -338,30 +316,7 @@
     opts.forEach(function(b) { b.classList.remove("selected"); });
     btn.classList.add("selected");
     answers[q] = btn.getAttribute("data-val");
-    var question = QUESTIONS.filter(function(x) { return x.q === q; })[0];
-    if (question && question.disqualifyOn === answers[q]) {
-      showDisqualified(question);
-      return;
-    }
     setTimeout(function() { goNext(next); }, 350);
-  }
-
-  // Permanently swaps a gate question's step for a dead-end message - no
-  // options or Back button left to click, so the disqualifying answer can't
-  // be undone and the quiz can't be submitted after it. Persists across
-  // reloads via localStorage, and fires a Meta Pixel custom event so
-  // disqualifications (and why) are visible in Events Manager.
-  function showDisqualified(question) {
-    var step = document.getElementById("step-" + (QUESTIONS.indexOf(question) + 1));
-    if (!step) { return; }
-    try {
-      localStorage.setItem("jake_quiz_disqualified", "1");
-      localStorage.setItem("jake_quiz_disqualified_q", question.q);
-    } catch (e) { /* no-op */ }
-    step.innerHTML = '<div class="verdict-box"><h3>Thanks for stopping by! &#128075;</h3>' +
-      '<p>' + question.disqualifyMessage + '</p></div>';
-    if (window.fbq) { fbq('trackCustom', 'Disqualified', { reason: question.disqualifyTag }); }
-    notifyEmbedResize();
   }
 
   function goNext(next) {
@@ -412,9 +367,9 @@
   window.addEventListener("orientationchange", function () { setTimeout(notifyEmbedResize, 300); });
 
   function updateProgress() {
-    var steps = { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "contact": 9, "report": 10 };
+    var steps = { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "contact": 7, "report": 8 };
     var cur = steps[currentStep] || 0;
-    var pct = Math.round((cur / 9) * 100);
+    var pct = Math.round((cur / 7) * 100);
     document.getElementById("progressFill").style.width = pct + "%";
   }
 
@@ -439,21 +394,25 @@
     var nameEl = document.getElementById("cf-name");
     var phoneEl = document.getElementById("cf-phone");
     var emailEl = document.getElementById("cf-email");
+    var suburbEl = document.getElementById("cf-suburb");
 
     var fn = nameEl.value.trim();
     var ph = phoneEl.value.trim();
     var em = emailEl.value.trim();
+    var sb = suburbEl.value.trim();
 
     var nameOk = fn.length > 0;
     var phoneOk = isValidPhone(ph);
     var emailOk = isValidEmail(em);
+    var suburbOk = sb.length > 0;
 
     setFieldValidity(nameEl, "cf-name-error", nameEl.dataset.touched === "1" && !nameOk);
     setFieldValidity(phoneEl, "cf-phone-error", ph.length > 0 && !phoneOk);
     setFieldValidity(emailEl, "cf-email-error", em.length > 0 && !emailOk);
+    setFieldValidity(suburbEl, "cf-suburb-error", suburbEl.dataset.touched === "1" && !suburbOk);
 
     var btn = document.getElementById("next-contact");
-    if (nameOk && phoneOk && emailOk) { btn.classList.add("enabled"); }
+    if (nameOk && phoneOk && emailOk && suburbOk) { btn.classList.add("enabled"); }
     else { btn.classList.remove("enabled"); }
   }
 
@@ -493,7 +452,7 @@
       name: document.getElementById("cf-name").value.trim(),
       phone: document.getElementById("cf-phone").value.trim(),
       email: document.getElementById("cf-email").value.trim(),
-      suburb: answerLabel("q7", answers.q7),
+      suburb: document.getElementById("cf-suburb").value.trim(),
       q1: answers.q1,
       q2: answers.q2,
       q3: answers.q3,
