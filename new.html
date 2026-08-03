@@ -235,13 +235,16 @@
         { val: "builder", icon: "&#127959;&#65039;", label: "I need the builder to supply the tiles", sub: "We help you select and source tiles within your budget" },
         { val: "self", icon: "&#129521;", label: "I will supply my own tiles", sub: "You purchase and deliver tiles to site before install" }
       ] },
-    { q: "q5", title: "Have you already received a quote?",
-      sub: "This helps us flag anything worth looking at in what you have seen so far.",
+    { q: "q5", title: "What's your renovation budget?",
+      sub: "This helps us make sure our service is the right fit for your project.",
       options: [
-        { val: "no", icon: "&#128269;", label: "No, still looking", sub: "Have not spoken to any builders yet" },
-        { val: "low", icon: "&#9888;&#65039;", label: "Yes - under $25,000", sub: "Worth understanding what is actually included" },
-        { val: "high", icon: "&#9989;", label: "Yes - over $25,000", sub: "In the right ballpark for a quality renovation" }
-      ] },
+        { val: "15-20", icon: "&#128269;", label: "$15,000 - $20,000", sub: "Still narrowing down the budget" },
+        { val: "25-35", icon: "&#9989;", label: "$25,000 - $35,000", sub: "A solid starting budget" },
+        { val: "35-45", icon: "&#9989;", label: "$35,000 - $45,000", sub: "Room to fully spec the renovation" }
+      ],
+      disqualifyOn: "15-20",
+      disqualifyTag: "Disqualified - Budget Too Low",
+      disqualifyMessage: "Our full-service renovations typically start from around $25,000 for a quality result, so a $15,000-$20,000 budget isn't quite the right fit for what we offer right now. We really appreciate your time, and wish you all the best with your renovation!" },
     { q: "q6", title: "Almost there",
       sub: "Knowing your timeline helps us give you the most relevant next step.",
       options: [
