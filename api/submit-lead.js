@@ -80,7 +80,10 @@ module.exports = async function handler(req, res) {
     phone: clip(body.phone, 20),
     email: clip(body.email, 200),
     suburb: clip(body.suburb, 100),
-    created_at: body.created_at || new Date().toISOString()
+    // Brisbane is UTC+10 year-round - matches what Meta Ads Manager shows for
+    // an AU ad account, so overnight leads land on the same calendar day there
+    // as they do here. Only used if the client didn't already send one.
+    created_at: body.created_at || new Date(Date.now() + 10 * 60 * 60 * 1000).toISOString().replace("Z", "+10:00")
   };
 
   if (!EMAIL_RE.test(contact.email)) {

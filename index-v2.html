@@ -465,6 +465,16 @@
     checkContact();
   }
 
+  // Brisbane is UTC+10 year-round (no daylight saving), which is what Meta
+  // Ads Manager displays for an AU ad account. Raw toISOString() is UTC, so
+  // overnight leads (midnight-10am Brisbane) landed on the previous calendar
+  // day versus what Meta showed - this shifts the instant then relabels the
+  // offset, so it's still a valid, unambiguous ISO 8601 timestamp.
+  function brisbaneTimestamp() {
+    var shifted = new Date(Date.now() + 10 * 60 * 60 * 1000);
+    return shifted.toISOString().replace("Z", "+10:00");
+  }
+
   function showReport() {
     var btn = document.getElementById("next-contact");
     if (!btn.classList.contains("enabled")) { return; }
@@ -516,7 +526,7 @@
       utm_ad: tracking.utm_ad,
       page_url: tracking.page_url,
       honeypot: document.getElementById("cf-hp").value,
-      created_at: new Date().toISOString()
+      created_at: brisbaneTimestamp()
     };
 
     return fetch("/api/submit-lead", {
