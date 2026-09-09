@@ -49,9 +49,9 @@
     --safe-b: env(safe-area-inset-bottom, 0px);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html { -webkit-text-size-adjust: 100%; }
-  body { font-family: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-  .quiz-outer { max-width: 680px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2rem) 1rem 4rem; }
+  html { -webkit-text-size-adjust: 100%; border-radius: 12px; overflow: hidden; }
+  body { font-family: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; border-radius: 12px; }
+  .quiz-outer { max-width: 720px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2rem) 1rem 4rem; }
   body.report-only { min-height: 0; }
   body.report-only .quiz-outer { padding-bottom: 1.5rem; }
   .progress-bar-bg { height: 8px; background: #e0e0db; border-radius: 5px; margin-bottom: clamp(1.5rem, 5vw, 2.5rem); overflow: hidden; }
