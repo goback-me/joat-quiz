@@ -282,10 +282,6 @@
   // Report-only embed mode: ?view=report&q2=..&q5=.. renders just the report
   // (used on the thank-you page after redirect) with no quiz UI around it.
   var embedParams = new URLSearchParams(window.location.search);
-  // Lets one deployed form redirect "Book my mapping session" to a different
-  // booking page per embed, instead of needing a separate form/file per
-  // destination - falls back to the default when the embed doesn't set it.
-  var bookUrl = embedParams.get("book_url") || "https://joat.bathroomrennos.com.au/book/";
   // Ad/campaign tracking: ?lead_source=facebook&campaign=..&ad_name=..&adset=..
   // (plus utm_source/utm_medium/utm_campaign/utm_content/utm_adset/utm_ad) forwarded
   // in from the host page's own URL (see embed snippet), plus the page it was
@@ -592,7 +588,7 @@
     document.getElementById("report-content").innerHTML = out;
   }
 
-  function bookSession() { window.top.location.href = bookUrl; }
+  function bookSession() { window.top.location.href = "https://joat.bathroomrennos.com.au/book/"; }
   </script>
   </body>
   </html>
