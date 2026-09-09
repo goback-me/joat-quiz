@@ -24,11 +24,17 @@ function clip(val, max) {
 // client. This is a deliberate await, not a fire-and-forget — but it's
 // wrapped so a slow/broken PDF service degrades to "no pdf_url" rather than
 // failing the whole lead submission.
+var PDF_TIMEOUT_MS = 60000; // PHP+Dompdf on shared hosting can be slow under real load; give it a full minute before giving up.
+
 async function generatePdf(payload) {
-  if (!process.env.PDF_SERVICE_URL) return null;
+  if (!process.env.PDF_SERVICE_URL) {
+    console.error("[pdf] skipped: PDF_SERVICE_URL is not set");
+    return null;
+  }
 
   var controller = new AbortController();
-  var timeout = setTimeout(function() { controller.abort(); }, 15000); // PHP+Dompdf on shared hosting can be slower than headless Chrome — longer timeout than before
+  var timeout = setTimeout(function() { controller.abort(); }, PDF_TIMEOUT_MS);
+  var started = Date.now();
 
   try {
     var response = await fetch(process.env.PDF_SERVICE_URL, {
@@ -42,21 +48,31 @@ async function generatePdf(payload) {
     });
 
     if (!response.ok) {
-      console.error("PDF service non-OK response:", response.status);
+      var bodyText = await response.text().catch(function() { return "<unreadable>"; });
+      console.error("[pdf] failed: non-OK response", response.status, response.statusText, "after", Date.now() - started, "ms - body:", bodyText.slice(0, 500));
       return null;
     }
 
     var data = await response.json();
-    return data && data.url ? data.url : null;
+    if (!data || !data.url) {
+      console.error("[pdf] failed: OK response but no url in body -", JSON.stringify(data).slice(0, 500));
+      return null;
+    }
+    console.log("[pdf] ok - generated in", Date.now() - started, "ms:", data.url);
+    return data.url;
   } catch (err) {
-    console.error("PDF generation failed:", err);
+    if (err.name === "AbortError") {
+      console.error("[pdf] failed: timed out after", Date.now() - started, "ms (cap is", PDF_TIMEOUT_MS, "ms)");
+    } else {
+      console.error("[pdf] failed: request error after", Date.now() - started, "ms -", err.message || err);
+    }
     return null;
   } finally {
     clearTimeout(timeout);
   }
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
@@ -125,8 +141,13 @@ module.exports = async function handler(req, res) {
 
   // 2. NOW fan out to Supabase + webhook(s) — pdf_url is already resolved
   //    (or null) by this point, so nothing downstream is racing the PDF.
-  var requests = [
-    fetch(process.env.SUPABASE_URL + "/rest/v1/leads", {
+  // Each request is labeled so the logs say exactly which destination
+  // succeeded/failed, instead of an unattributed "Lead submission error".
+  var requests = [];
+  var labels = [];
+
+  if (process.env.SUPABASE_URL) {
+    requests.push(fetch(process.env.SUPABASE_URL + "/rest/v1/leads", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -135,24 +156,37 @@ module.exports = async function handler(req, res) {
         "Prefer": "return=minimal"
       },
       body: JSON.stringify(supabasePayload)
-    })
-  ];
+    }));
+    labels.push("supabase");
+  } else {
+    console.log("[lead] skipped supabase: SUPABASE_URL is not set");
+  }
 
   // WEBHOOK_URL can be a single URL or a comma-separated list to fan the lead out to multiple webhooks.
-  (process.env.WEBHOOK_URL || "").split(",").map(function(u) { return u.trim(); }).filter(Boolean).forEach(function(url) {
+  var webhookUrls = (process.env.WEBHOOK_URL || "").split(",").map(function(u) { return u.trim(); }).filter(Boolean);
+  if (!webhookUrls.length) { console.error("[lead] no WEBHOOK_URL configured - nowhere to send this lead"); }
+  webhookUrls.forEach(function(url) {
     requests.push(fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(webhookPayload)
     }));
+    labels.push("webhook:" + url);
   });
+
+  if (!requests.length) {
+    console.error("[lead] no destinations configured at all - lead was not sent anywhere");
+    res.status(502).json({ error: "No lead destinations configured" });
+    return;
+  }
 
   var results = await Promise.allSettled(requests);
   var anyOk = results.some(function(r) { return r.status === "fulfilled" && r.value.ok; });
 
-  results.forEach(function(r) {
-    if (r.status === "rejected") { console.error("Lead submission error:", r.reason); }
-    else if (!r.value.ok) { console.error("Lead submission non-OK response:", r.value.status); }
+  results.forEach(function(r, i) {
+    if (r.status === "rejected") { console.error("[lead] failed (" + labels[i] + "):", (r.reason && r.reason.message) || r.reason); }
+    else if (!r.value.ok) { console.error("[lead] non-OK response (" + labels[i] + "):", r.value.status); }
+    else { console.log("[lead] ok (" + labels[i] + ")"); }
   });
 
   if (anyOk) {
@@ -160,4 +194,10 @@ module.exports = async function handler(req, res) {
   } else {
     res.status(502).json({ error: "Failed to save lead" });
   }
-};
+}
+
+module.exports = handler;
+// Vercel kills a function at its own platform timeout regardless of our own
+// AbortController - without this, a 60s PDF wait could get cut off by a
+// shorter default before it ever gets the chance to time out gracefully.
+module.exports.config = { maxDuration: 70 };
