@@ -308,6 +308,13 @@
   // booking page per embed, instead of needing a separate form/file per
   // destination - falls back to the default when the embed doesn't set it.
   var bookUrl = embedParams.get("book_url") || "https://joat.bathroomrennos.com.au/v3/book/";
+  // Carried over from the contact step via the /report/ redirect (see
+  // showReport()) so the booking page can be pre-filled - see bookSession().
+  var contact = {
+    name: embedParams.get("name") || "",
+    phone: embedParams.get("phone") || "",
+    email: embedParams.get("email") || ""
+  };
   // Ad/campaign tracking: ?lead_source=facebook&campaign=..&ad_name=..&adset=..
   // (plus utm_source/utm_medium/utm_campaign/utm_content/utm_adset/utm_ad) forwarded
   // in from the host page's own URL (see embed snippet), plus the page it was
@@ -496,9 +503,25 @@
     var maxWait = new Promise(function(resolve) { setTimeout(resolve, 4000); });
     var minWait = new Promise(function(resolve) { setTimeout(resolve, 600); });
     Promise.all([Promise.race([submitLead(), maxWait]), minWait]).then(function() {
-      var q = "?q2=" + encodeURIComponent(answers.q2 || "") + "&q5=" + encodeURIComponent(answers.q5 || "");
-      window.top.location.href = "https://joat.bathroomrennos.com.au/v3/book/";
+      var name = document.getElementById("cf-name").value.trim();
+      var phone = document.getElementById("cf-phone").value.trim();
+      var email = document.getElementById("cf-email").value.trim();
+      window.top.location.href = withContactParams(bookUrl, name, phone, email);
     });
+  }
+
+  // Appends the visitor's contact details as query params onto the booking
+  // URL (first_name/last_name/phone/email) so the booking page can pre-fill
+  // them - there's no separate last-name field in this form, so it's always
+  // "-". Uses the URL API so this works whether bookUrl already has its own
+  // query string or not.
+  function withContactParams(url, name, phone, email) {
+    var u = new URL(url, window.location.href);
+    u.searchParams.set("first_name", name || "");
+    u.searchParams.set("last_name", "-");
+    u.searchParams.set("phone", phone || "");
+    u.searchParams.set("email", email || "");
+    return u.toString();
   }
 
   function answerLabel(q, val) {
@@ -651,7 +674,7 @@
     document.getElementById("report-content").innerHTML = out;
   }
 
-  function bookSession() { window.top.location.href = bookUrl; }
+  function bookSession() { window.top.location.href = withContactParams(bookUrl, contact.name, contact.phone, contact.email); }
   </script>
   </body> 
   </html>
