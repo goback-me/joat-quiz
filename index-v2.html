@@ -308,6 +308,10 @@
   // booking page per embed, instead of needing a separate form/file per
   // destination - falls back to the default when the embed doesn't set it.
   var bookUrl = embedParams.get("book_url") || "https://joat.bathroomrennos.com.au/v3/book/";
+  // If set, a disqualified user gets redirected here instead of seeing the
+  // inline dead-end message - lets one embed send disqualified traffic
+  // somewhere else (e.g. a different offer) instead of just a message.
+  var disqualifyUrl = embedParams.get("disqualify_url") || "";
   // Carried over from the contact step via the /report/ redirect (see
   // showReport()) so the booking page can be pre-filled - see bookSession().
   var contact = {
@@ -371,6 +375,13 @@
   // reloads via localStorage, and fires a Meta Pixel custom event so
   // disqualifications (and why) are visible in Events Manager.
   function showDisqualified(question) {
+    if (window.fbq) { fbq('trackCustom', 'Disqualified', { reason: question.disqualifyTag }); }
+
+    if (disqualifyUrl) {
+      window.top.location.href = disqualifyUrl;
+      return;
+    }
+
     var step = document.getElementById("step-" + (QUESTIONS.indexOf(question) + 1));
     if (!step) { return; }
     try {
@@ -379,7 +390,6 @@
     } catch (e) { /* no-op */ }
     step.innerHTML = '<div class="verdict-box"><h3>Thanks for stopping by! &#128075;</h3>' +
       '<p>' + question.disqualifyMessage + '</p></div>';
-    if (window.fbq) { fbq('trackCustom', 'Disqualified', { reason: question.disqualifyTag }); }
     notifyEmbedResize();
   }
 
