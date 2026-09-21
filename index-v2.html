@@ -37,7 +37,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
   <style>
   :root {
-    --bg: #f5f5f3;
+    --bg: #f8f8f8;
     --ink: #1a1a18;
     --muted: #666;
     --line: #e8e8e4;
@@ -296,22 +296,6 @@
   // Report-only embed mode: ?view=report&q2=..&q5=.. renders just the report
   // (used on the thank-you page after redirect) with no quiz UI around it.
   var embedParams = new URLSearchParams(window.location.search);
-  // Lets one deployed form use a different page background per embed (e.g.
-  // to match the host page) via ?bg=<css-color> - accepts bare hex (no need
-  // to percent-encode "#") or any CSS color value. Falls back to the
-  // default --bg when unset.
-  var bgParam = embedParams.get("bg");
-  if (bgParam) {
-    document.documentElement.style.setProperty("--bg", /^[0-9a-fA-F]{3,8}$/.test(bgParam) ? "#" + bgParam : bgParam);
-  }
-  // Lets one deployed form redirect "Book my mapping session" to a different
-  // booking page per embed, instead of needing a separate form/file per
-  // destination - falls back to the default when the embed doesn't set it.
-  var bookUrl = embedParams.get("book_url") || "https://joat.bathroomrennos.com.au/v3/book/";
-  // If set, a disqualified user gets redirected here instead of seeing the
-  // inline dead-end message - lets one embed send disqualified traffic
-  // somewhere else (e.g. a different offer) instead of just a message.
-  var disqualifyUrl = embedParams.get("disqualify_url") || "";
   // Carried over from the contact step via the /report/ redirect (see
   // showReport()) so the booking page can be pre-filled - see bookSession().
   var contact = {
@@ -376,11 +360,6 @@
   // disqualifications (and why) are visible in Events Manager.
   function showDisqualified(question) {
     if (window.fbq) { fbq('trackCustom', 'Disqualified', { reason: question.disqualifyTag }); }
-
-    if (disqualifyUrl) {
-      window.top.location.href = disqualifyUrl;
-      return;
-    }
 
     var step = document.getElementById("step-" + (QUESTIONS.indexOf(question) + 1));
     if (!step) { return; }
@@ -516,14 +495,23 @@
       var name = document.getElementById("cf-name").value.trim();
       var phone = document.getElementById("cf-phone").value.trim();
       var email = document.getElementById("cf-email").value.trim();
-      window.top.location.href = withContactParams(bookUrl, name, phone, email);
+      window.top.location.href = withContactParams(thankYouUrl(), name, phone, email);
     });
   }
 
-  // Appends the visitor's contact details as query params onto the booking
-  // URL (first_name/last_name/phone/email) so the booking page can pre-fill
-  // them - there's no separate last-name field in this form, so it's always
-  // "-". Uses the URL API so this works whether bookUrl already has its own
+  // Where a qualified submission lands depends on the timeline answer (q6):
+  // "asap" gets the priority thank-you page, anything else gets the
+  // softer one. Same rule regardless of which landing page embeds the form.
+  function thankYouUrl() {
+    return answers.q6 === "asap"
+      ? "https://joat.bathroomrennos.com.au/thank-you/"
+      : "https://joat.bathroomrennos.com.au/thank-you-ish/";
+  }
+
+  // Appends the visitor's contact details as query params onto the target
+  // URL (first_name/last_name/phone/email) so that page can pre-fill them -
+  // there's no separate last-name field in this form, so it's always "-".
+  // Uses the URL API so this works whether the URL already has its own
   // query string or not.
   function withContactParams(url, name, phone, email) {
     var u = new URL(url, window.location.href);
@@ -684,7 +672,7 @@
     document.getElementById("report-content").innerHTML = out;
   }
 
-  function bookSession() { window.top.location.href = withContactParams(bookUrl, contact.name, contact.phone, contact.email); }
+  function bookSession() { window.top.location.href = withContactParams(thankYouUrl(), contact.name, contact.phone, contact.email); }
   </script>
   </body> 
   </html>
