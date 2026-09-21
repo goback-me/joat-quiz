@@ -327,6 +327,10 @@
     answers.q5 = embedParams.get("q5") || "";
     renderReport();
     notifyEmbedResize();
+  } else if (localStorage.getItem("jake_quiz_google_v3_disqualified") === "1") {
+    // Already disqualified on a previous visit (same browser) - skip the
+    // quiz entirely and send them straight back to the disqualify page.
+    window.top.location.href = "https://joatgooglelp.bathroomrennos.com.au/appreciated";
   } else {
     renderQuestionSteps();
     updateProgress();
@@ -346,10 +350,13 @@
   }
 
   // Fires a Meta Pixel custom event (so disqualifications, and why, are
-  // visible in Events Manager) then redirects straight to this form's
-  // disqualify page - index-v2.html redirects to its own instead.
+  // visible in Events Manager), remembers it so a reload/revisit skips
+  // straight back to the disqualify page instead of offering the quiz
+  // again, then redirects there now - index-v2.html uses its own page
+  // and localStorage key.
   function showDisqualified(question) {
     if (window.fbq) { fbq('trackCustom', 'Disqualified', { reason: question.disqualifyTag }); }
+    try { localStorage.setItem("jake_quiz_google_v3_disqualified", "1"); } catch (e) { /* no-op */ }
     window.top.location.href = "https://joatgooglelp.bathroomrennos.com.au/appreciated";
   }
 
