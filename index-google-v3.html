@@ -500,12 +500,13 @@
   }
 
   // Where a qualified submission lands depends on the timeline answer (q6):
-  // "asap" gets the priority thank-you page, anything else gets the
-  // softer one. Same rule regardless of which landing page embeds the form.
+  // "asap" gets the priority page, anything else gets the softer one.
+  // This file's (index-google-v3.html) targets are the joatgooglelp
+  // pages - index-v2.html has its own separate targets.
   function thankYouUrl() {
     return answers.q6 === "asap"
-      ? "https://joat.bathroomrennos.com.au/thank-you/"
-      : "https://joat.bathroomrennos.com.au/thank-you-ish/";
+      ? "https://joatgooglelp.bathroomrennos.com.au/step2/"
+      : "https://joatgooglelp.bathroomrennos.com.au/step2-ish/";
   }
 
   // Appends the visitor's contact details as query params onto the target
