@@ -330,14 +330,6 @@
   } else {
     renderQuestionSteps();
     updateProgress();
-    // Per-browser tag so a disqualified user still sees the same dead-end
-    // message after reloading instead of getting another shot at the quiz.
-    var dqQuestion = QUESTIONS.filter(function(x) { return x.q === localStorage.getItem("jake_quiz_disqualified_q"); })[0];
-    if (dqQuestion) {
-      answers[dqQuestion.q] = dqQuestion.disqualifyOn;
-      goToStep(String(QUESTIONS.indexOf(dqQuestion) + 1));
-      showDisqualified(dqQuestion);
-    }
   }
 
   function selectOpt(btn, q, next) {
@@ -353,23 +345,12 @@
     setTimeout(function() { goNext(next); }, 350);
   }
 
-  // Permanently swaps a gate question's step for a dead-end message - no
-  // options or Back button left to click, so the disqualifying answer can't
-  // be undone and the quiz can't be submitted after it. Persists across
-  // reloads via localStorage, and fires a Meta Pixel custom event so
-  // disqualifications (and why) are visible in Events Manager.
+  // Fires a Meta Pixel custom event (so disqualifications, and why, are
+  // visible in Events Manager) then redirects straight to this form's
+  // disqualify page - index-google-v3.html redirects to its own instead.
   function showDisqualified(question) {
     if (window.fbq) { fbq('trackCustom', 'Disqualified', { reason: question.disqualifyTag }); }
-
-    var step = document.getElementById("step-" + (QUESTIONS.indexOf(question) + 1));
-    if (!step) { return; }
-    try {
-      localStorage.setItem("jake_quiz_disqualified", "1");
-      localStorage.setItem("jake_quiz_disqualified_q", question.q);
-    } catch (e) { /* no-op */ }
-    step.innerHTML = '<div class="verdict-box"><h3>Thanks for stopping by! &#128075;</h3>' +
-      '<p>' + question.disqualifyMessage + '</p></div>';
-    notifyEmbedResize();
+    window.top.location.href = "https://joat.bathroomrennos.com.au/appreciated";
   }
 
   function goNext(next) {
